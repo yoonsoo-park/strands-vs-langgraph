@@ -58,8 +58,8 @@ async def main():
         # Strands handles the loop, tool execution, and state internally
         response = await agent.invoke_async(user_input)
         
-        # In Strands, the response object contains the text and the trace
-        print(f"\nFinal Response:\n{response.content}")
+        # In Strands, the response object contains the text in the message attribute
+        print(f"\nFinal Response:\n{response.message.content[0].text if hasattr(response.message, 'content') else response.message}")
         
     except Exception as e:
         print(f"\nExecution Error (Likely missing AWS Credentials for Bedrock): {e}")
