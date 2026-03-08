@@ -12,7 +12,7 @@ export class InfrastructureStack extends cdk.Stack {
     // 1. VPC Configuration (Cost-Optimized for PoC)
     // Only 1 NAT Gateway to keep daily idle cost low (~$1.08/day)
     const vpc = new ec2.Vpc(this, 'AgentCoreVpc', {
-      maxAzs: 1,
+      availabilityZones: ['us-east-1b'],
       subnetConfiguration: [
         {
           subnetType: ec2.SubnetType.PUBLIC,
