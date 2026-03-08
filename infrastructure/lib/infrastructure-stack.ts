@@ -45,6 +45,12 @@ export class InfrastructureStack extends cdk.Stack {
       ],
     });
 
+    const runtimeSg = new ec2.SecurityGroup(this, 'AgentCoreRuntimeSG', {
+      vpc: vpc,
+      allowAllOutbound: true,
+      description: 'Security group for AgentCore Runtimes',
+    });
+
     // 3. LangGraph & Strands Pocs on AgentCore Runtime
     try {
       const langgraphRuntime = new agentcore.Runtime(this, 'LangGraphRuntime', {
@@ -52,11 +58,12 @@ export class InfrastructureStack extends cdk.Stack {
         agentRuntimeArtifact: agentcore.AgentRuntimeArtifact.fromCodeAsset({
           path: path.join(__dirname, '../../langgraph_agent'),
           runtime: agentcore.AgentCoreRuntime.PYTHON_3_11,
-          entrypoint: ['python', 'agent.py']
+          entrypoint: ['agent.py']
         }),
         networkConfiguration: agentcore.RuntimeNetworkConfiguration.usingVpc(this, {
           vpc: vpc,
-          vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS }
+          vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
+          securityGroups: [runtimeSg]
         }),
         executionRole: executionRole
       });
@@ -66,11 +73,12 @@ export class InfrastructureStack extends cdk.Stack {
         agentRuntimeArtifact: agentcore.AgentRuntimeArtifact.fromCodeAsset({
           path: path.join(__dirname, '../../strands_agent'),
           runtime: agentcore.AgentCoreRuntime.PYTHON_3_11,
-          entrypoint: ['python', 'agent.py']
+          entrypoint: ['agent.py']
         }),
         networkConfiguration: agentcore.RuntimeNetworkConfiguration.usingVpc(this, {
           vpc: vpc,
-          vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS }
+          vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
+          securityGroups: [runtimeSg]
         }),
         executionRole: executionRole
       });
